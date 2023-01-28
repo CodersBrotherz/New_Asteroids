@@ -1,0 +1,58 @@
+body {
+    background-color: rgb(44, 44, 44);
+    text-align:center;
+}
+
+canvas {
+    z-index: 1;
+    background-color: rgb(172, 172, 172);
+}
+
+#menu {
+    z-index: 2;
+    flex-direction: column;
+    row-gap: 5px;
+    align-items: center;
+    position: fixed;
+    left: 0%;
+    top: 0;
+}
+
+#game-over-screen {
+    z-index: 2;
+    flex-direction: column;
+    color: whitesmoke;
+    margin: auto;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+#game-over-screen > h1 {
+    font-size: 100px;
+}
+
+#game-over-screen > h2 {
+    color: rgba(245, 245, 245, 0);
+    animation: blink 3s normal 2s infinite;
+}
+
+.velocimeter {
+    background-color: rgb(228, 228, 228);
+    border: 1px solid rgb(255, 255, 255);
+    height: 30px;
+    width: 480px;
+}
+
+.velocimeter>div {
+    background-color: rgba(127, 255, 212, 0.733);
+    height: 100%;
+}
+
+@keyframes blink {
+    50% {color: whitesmoke}
+    100% {color: rgba(245, 245, 245, 0)}
+}

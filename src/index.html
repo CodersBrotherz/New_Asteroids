@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asteroids</title>
+    <link rel="stylesheet" href="./styles/normalize.css" />
+    <link rel="stylesheet" href="./styles/style.css" />
+    <link rel="shortcut icon" href="./assets/favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <!-- <div class="velocimeter">
+      <div id="velocimeter-bar"></div>
+    </div> -->
+    <div id="menu" style="display: none">
+      <h1>Menu</h1>
+      <!-- Main Menu -->
+      <button id="btn-mode-singleplayer" class="menu-main">Singleplayer</button>
+      <button id="btn-mode-coop" class="menu-main">Coop</button>
+      <button id="btn-mode-online" class="menu-main" onclick="
+        document.querySelectorAll('.menu-online').forEach(menuOnline => menuOnline.style.display = 'inherit');
+        document.querySelectorAll('.menu-main').forEach(mainMenu => mainMenu.style.display = 'none');
+        ">Online</button>
+      <!-- Online Menu -->
+      <button id="btn-online-host" class="menu-online" style="display: none;">Host</button>
+      <button id="btn-online-join" class="menu-online" style="display: none;">Join</button>
+      <button id="btn-online-back" class="menu-online" style="display: none;" onclick="
+        document.querySelectorAll('.menu-main').forEach(mainMenu => mainMenu.style.display = 'inherit');
+        document.querySelectorAll('.menu-online').forEach(menuOnline => menuOnline.style.display = 'none');
+      "> ← </button>
+    </div>
+    <div id="game-over-screen" style="display: none">
+      <h1>GAME OVER</h1>
+      <h2>Press any key to try again</h2>   
+    </div>
+    <script type="module" src="./js/app.dev.js"></script>
+  </body>
+</html>
