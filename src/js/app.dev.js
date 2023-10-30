@@ -32,6 +32,9 @@ const startGame = (mode) => {
         if (e.key == ' ') {
             gameArea.shoot(gameArea.spaceShip)
         }
+        else if (e.key == 'Escape') {
+            window.location.replace('');
+        }
     })
     window.addEventListener('keyup', function (e) {
         if (gameArea.gameOver && e.key) {
