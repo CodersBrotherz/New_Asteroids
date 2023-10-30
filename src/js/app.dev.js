@@ -17,6 +17,8 @@ const menu = () => {
     // 2 - Coop
     document.getElementById("btn-mode-singleplayer").addEventListener("click", () => startGame(1));
     document.getElementById("btn-mode-coop").addEventListener("click", () => startGame(2));
+    document.getElementById("btn-online-host").addEventListener("click", () => startGame(3));
+    document.getElementById("btn-online-join").addEventListener("click", () => startGame(4));
 }
 
 const startGame = (mode) => {

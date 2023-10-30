@@ -1,18 +1,27 @@
 import * as C from '../constants.js'
 
 class Asteroid {
-    constructor(id, canvas, ctx, x, y, radius = C.AST_DEF_RADIUS) {
+    constructor(id, canvas, ctx, x, y, obj, radius = C.AST_DEF_RADIUS) {
         this.Asteroid = Asteroid.bind(this);
         this.canvas = canvas;
         this.ctx = ctx;
-        this.id = id;
-        this.speed = 0;
-        this.x = 0;
-        this.y = 0;
-        this.radius = radius;
-        this.generate(x, y);
         this.debug = false;
         this.type = 'asteroid';
+        if (obj === undefined) {
+            this.id = id;
+            this.speed = 0;
+            this.x = 0;
+            this.y = 0;
+            this.radius = radius;
+            this.generate(x, y);
+        } else {
+            this.id = obj.id;
+            this.speed = obj.speed;
+            this.x = obj.x;
+            this.y = obj.y;
+            this.radius = obj.radius;
+            this.generate(obj.x, obj.y);
+        }
     }
     generate(x, y) {
         this.updateAngle();
@@ -26,7 +35,7 @@ class Asteroid {
                 this.x = Math.floor(Math.random() * this.canvas.width);
                 this.y = Math.floor(Math.random() * this.canvas.height);
             } while (
-                Math.sqrt(Math.pow(this.x - this.canvas.width / 2, 2) + Math.pow(this.y - this.canvas.height / 2, 2)) 
+                Math.sqrt(Math.pow(this.x - this.canvas.width / 2, 2) + Math.pow(this.y - this.canvas.height / 2, 2))
                 <
                 this.radius + 100
             )

@@ -40,6 +40,42 @@ class GameArea {
         if (this.debug) {
             this.debugMode(this.debug);
         }
+        if (this.gameMode >= 3) {
+            this.socket = io("http://localhost:3000");
+            this.socket.on("player-joined", (info) => {
+                console.log("Player joined room");
+                delete info.ctx;
+                delete info.canvas;
+                delete info.image;
+                this.secondSpaceShip = new SpaceShip(40, 40, this.canvas.width / 2, this.canvas.height / 2, this.context, this.canvas);
+                Object.assign(this.secondSpaceShip, info);
+            });
+            this.socket.on('player-moving', (info) => {
+                delete info.ctx;
+                delete info.canvas;
+                delete info.image;
+                Object.assign(this.secondSpaceShip, info);
+            });
+            this.socket.on('player-left', () => {
+                this.secondSpaceShip = null;
+            });
+            this.socket.on('update-asteroids', (data) => {
+                // const asteroids = data.map(a => {
+                //     return new Asteroid(null, this.canvas, this.context, null, null, a);
+                // });
+                // this.asteroids = asteroids;
+            });
+            const roomId = "Placeholder";
+            switch (this.gameMode) {
+                case 3:
+                    this.socket.emit("host-game", roomId);
+                    break;
+                case 4:
+                    this.socket.emit("join-game", { roomId, info: this.spaceShip })
+                    this.secondSpaceShip = new SpaceShip(40, 40, this.canvas.width / 2, this.canvas.height / 2, this.context, this.canvas);
+                    break;
+            }
+        }
     }
     /**
      * Visualize the Game Over screen and stop the game
@@ -111,6 +147,10 @@ class GameArea {
         //Update spaceship
         this.spaceShip.newPos()
         this.spaceShip.update()
+        if (this.gameMode >= 3 && this.secondSpaceShip) {
+            this.secondSpaceShip.newPos()
+            this.secondSpaceShip.update()
+        }
         //Update bullets
         this.bullets.forEach(bullet => {
             bullet.update()
@@ -157,6 +197,11 @@ class GameArea {
         if (this.keys && this.keys['a'] || this.keys && this.keys['ArrowLeft']) {
             this.spaceShip.moveAngle = -4
         }
+        if (this.gameMode >= 3) {
+            this.socket.emit('move', this.spaceShip);
+            if (this.gameMode == 3)
+                this.socket.emit('update-asteroids', this.asteroids);
+        }
         this.updateActorsPosition();
         this.drawGUI();
     }
@@ -165,7 +210,7 @@ class GameArea {
      * @param {*} obj Actor that spawns the bullet
      */
     shoot(obj) {
-        if (!this.cooldown.bullet){
+        if (!this.cooldown.bullet) {
             this.bulletCount += 1
             const bulletId = this.bulletCount
             this.bullets.push(new Bullet(
@@ -195,7 +240,7 @@ class GameArea {
     checkCrash(obj1, obj2) {
         //Check collision
         if (this.checkDistanceBetween(obj1, obj2) < obj2.width / 2 + obj1.radius) {
-            if (obj2.type == 'spaceship'){
+            if (obj2.type == 'spaceship') {
                 if (this.debug) {
                     //Change id of asteroid that crashed
                     this.spaceShip.setCrashed(obj1.id)
@@ -235,9 +280,9 @@ class GameArea {
                 //If we can make more than one asteroid from the old one
                 if (newAsteroids > 1) {
                     //We create new asteroids
-                    if (this.debug)console.log(`Making ${newAsteroids} new from the rests of the asteroid.`);
+                    if (this.debug) console.log(`Making ${newAsteroids} new from the rests of the asteroid.`);
                     for (let i = 0; i < newAsteroids; i++) {
-                        this.asteroids.push(new Asteroid(this.actors++, this.canvas, this.context, obj.x, obj.y, obj.radius / newAsteroids))
+                        this.asteroids.push(new Asteroid(this.actors++, this.canvas, this.context, obj.x, null, obj.y, obj.radius / newAsteroids))
                     }
                 } else {
                     //If there are less asteroids we spawn new ones
