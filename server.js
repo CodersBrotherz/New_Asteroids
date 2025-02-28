@@ -19,30 +19,37 @@ const io = require("socket.io")(server, {
  */
 class Player {
     constructor(socketId) {
-        this.socketId = socketId;
-        this.hosting = false;    // Indica si el jugador es anfitrión
-        this.room = null;        // Sala actual del jugador
+        this._socketId = socketId;
+        this._hosting = false;    // Indica si el jugador es anfitrión
+        this._room = null;        // Sala actual del jugador
     }
 
     removeRoom() {
-        this.room = null;
+        this._room = null;
     }
 
     isHosting() {
-        return this.hosting;
+        return this._hosting;
     }
 
     set room(roomId) {
-        this.room = roomId;
+        this._room = roomId;
     }
+    
     get room() {
-        return this.room;
+        return this._room;
     }
+    
     get socketId() {
-        return this.socketId;
+        return this._socketId;
     }
+    
+    set socketId(val) {
+        this._socketId = val;
+    }
+    
     set hosting(val) {
-        this.hosting = val;
+        this._hosting = val;
     }
 }
 
@@ -146,7 +153,7 @@ io.on('connection', (socket) => {
 
     // Evento para crear una sala como anfitrión
     socket.on('host-game', (roomId) => {
-        player.setHosting(true);
+        player.hosting = true;  // Fixed from setHosting to the proper setter
         conn.addPlayerToRoom(player, roomId);
         socket.join(roomId);
     });
