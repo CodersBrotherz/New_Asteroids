@@ -2,44 +2,38 @@ import * as C from '../constants.js'
 
 class Asteroid {
     constructor(id, canvas, ctx, x, y, obj, radius = C.AST_DEF_RADIUS) {
-        this.Asteroid = Asteroid.bind(this);
+
         this.canvas = canvas;
         this.ctx = ctx;
         this.debug = false;
         this.type = 'asteroid';
-        if (obj === undefined) {
-            this.id = id;
-            this.speed = 0;
-            this.x = 0;
-            this.y = 0;
-            this.radius = radius;
-            this.generate(x, y);
+
+        this.id = id;
+        this.speed = 0;
+        this.x = x || 0;
+        this.y = y || 0;
+        this.radius = radius;
+
+        if (!x || !y) {
+            this.generate();
         } else {
-            this.id = obj.id;
-            this.speed = obj.speed;
-            this.x = obj.x;
-            this.y = obj.y;
-            this.radius = obj.radius;
-            this.generate(obj.x, obj.y);
+            this.updateAngle();
+            this.speed = (Math.random() * C.AST_SPEED) + 1;
         }
     }
-    generate(x, y) {
+    generate() {
         this.updateAngle();
-        this.speed = (Math.random() * C.AST_SPEED) + 1
+        this.speed = (Math.random() * C.AST_SPEED) + 1;
         this.radius = Math.floor((Math.random() * this.radius) + C.AST_MIN_SIZE);
-        if (x && y) {
-            this.x = x
-            this.y = y
-        } else {
-            do {
-                this.x = Math.floor(Math.random() * this.canvas.width);
-                this.y = Math.floor(Math.random() * this.canvas.height);
-            } while (
-                Math.sqrt(Math.pow(this.x - this.canvas.width / 2, 2) + Math.pow(this.y - this.canvas.height / 2, 2))
-                <
-                this.radius + 100
-            )
-        }
+
+        do {
+            this.x = Math.floor(Math.random() * this.canvas.width);
+            this.y = Math.floor(Math.random() * this.canvas.height);
+        } while (
+            Math.sqrt(Math.pow(this.x - this.canvas.width / 2, 2) + Math.pow(this.y - this.canvas.height / 2, 2))
+            <
+            this.radius + 100
+        );
     }
     update() {
         this.ctx.beginPath();
