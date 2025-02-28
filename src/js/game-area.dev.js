@@ -60,10 +60,25 @@ class GameArea {
                 this.secondSpaceShip = null;
             });
             this.socket.on('update-asteroids', (data) => {
-                // const asteroids = data.map(a => {
-                //     return new Asteroid(null, this.canvas, this.context, null, null, a);
-                // });
-                // this.asteroids = asteroids;
+                if (this.gameMode === 4) { // Only update asteroids if client is not the host
+                    this.asteroids = data.map(a => {
+                        const asteroid = new Asteroid(
+                            a.id,
+                            this.canvas,
+                            this.context,
+                            a.x,
+                            a.y,
+                            null,
+                            a.radius
+                        );
+
+                        // Copy other asteroid properties
+                        asteroid.angle = a.angle;
+                        asteroid.speed = a.speed;
+
+                        return asteroid;
+                    });
+                }
             });
             const roomId = "Placeholder";
             switch (this.gameMode) {
