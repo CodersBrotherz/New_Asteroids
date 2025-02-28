@@ -11,8 +11,8 @@ const io = require("socket.io")(server, {
     }
 });
 class Player {
-    constructor(socket) {
-        this.socket = socket;
+    constructor(socketId) {
+        this.socketId = socketId;
         this.hosting = false;
         this.room = null;
     }
@@ -25,8 +25,8 @@ class Player {
     getRoom() {
         return this.room;
     }
-    getSocket() {
-        return this.socket;
+    getSocketId() {
+        return this.socketId;
     }
     setHosting(val) {
         this.hosting = val;
@@ -44,6 +44,7 @@ class Room {
 class ConnectionHandler {
     constructor() {
         this.rooms = new Map();
+        this.players = new Map();
     }
     createRoom(roomId) {
         if (!this.rooms.has(roomId))
@@ -51,7 +52,7 @@ class ConnectionHandler {
     }
     removeRoom(roomId) {
         if (this.rooms.has(roomId)) {
-            this.rooms.get(roomId).players.map(p => p.removeRoom())
+            this.rooms.get(roomId).players.forEach(p => p.removeRoom());
             this.rooms.delete(roomId);
         }
     }
@@ -65,39 +66,58 @@ class ConnectionHandler {
         player.setRoom(roomId);
         const room = this.rooms.get(roomId);
         room.players.push(player);
+        this.players.set(player.getSocketId(), player);
         this.rooms.set(roomId, room);
     }
     removePlayerFromRoom(player, roomId) {
         if (this.rooms.has(roomId)) {
             const room = this.rooms.get(roomId);
-            room.players = room.player.filter(p => p !== player);
+            room.players = room.players.filter(p => p.getSocketId() !== player.getSocketId());
             this.rooms.set(roomId, room);
         }
+        this.players.delete(player.getSocketId());
+    }
+    getPlayerBySocketId(socketId) {
+        return this.players.get(socketId);
     }
 }
 const conn = new ConnectionHandler();
 io.on('connection', (socket) => {
     const player = new Player(socket.id);
+
     socket.on('host-game', (roomId) => {
         player.setHosting(true);
         conn.addPlayerToRoom(player, roomId);
         socket.join(roomId);
     });
+
     socket.on('join-game', (data) => {
         const { roomId, info } = data;
         conn.addPlayerToRoom(player, roomId);
         socket.join(roomId);
         socket.to(roomId).emit('player-joined', info);
     });
+
     socket.on('move', (info) => {
         if (player.getRoom())
             socket.to(player.getRoom()).emit('player-moving', info);
     });
-    socket.on('update-asteroids', (data) => socket.to(player.getRoom()).emit('update-asteroids', data));
+
+    socket.on('update-asteroids', (data) => {
+        if (player.getRoom()) {
+            socket.to(player.getRoom()).emit('update-asteroids', data);
+        }
+    });
+
     socket.on('disconnect', () => {
-        socket.to(player.getRoom()).emit("player-left");
-        if (player.isHosting())
-            conn.removeRoom(player.getRoom());
+        const roomId = player.getRoom();
+        if (roomId) {
+            socket.to(roomId).emit("player-left");
+            if (player.isHosting())
+                conn.removeRoom(roomId);
+            else
+                conn.removePlayerFromRoom(player, roomId);
+        }
         console.log('User disconnected');
     });
 });
